@@ -1,0 +1,209 @@
+{
+  "simulation_id": "24edd011-72fa-4444-b759-999d90335ccf",
+  "started_at": "2025-08-21T06:40:52Z",
+  "protagonist": {
+    "name": "Alex",
+    "personality": "anxious_overthinker"
+  },
+  "other_participant": {
+    "name": "Blake"
+  },
+  "timeline": [
+    {
+      "timestamp": "2025-08-21T06:40:25Z",
+      "type": "thought",
+      "content": "What if they think I'm annoying? No, it's fine. It's fine."
+    },
+    {
+      "timestamp": "2025-08-21T06:40:25Z",
+      "type": "tool_use",
+      "tool": "send_message",
+      "data": {
+        "message": "So I saw this really interesting article today and it reminded me of our conversation. Want to hear about it?",
+        "delivered": true
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:32Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:32Z",
+      "type": "thought",
+      "content": "They read it but haven't responded yet. They're probably just busy."
+    },
+    {
+      "timestamp": "2025-08-21T06:40:35Z",
+      "type": "thought",
+      "content": "Is this too much? Maybe I should wait longer..."
+    },
+    {
+      "timestamp": "2025-08-21T06:40:35Z",
+      "type": "tool_use",
+      "tool": "send_message",
+      "data": {
+        "message": "So I saw this really interesting article today and it reminded me of our conversation. Want to hear about it?",
+        "delivered": true
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:41Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:41Z",
+      "type": "thought",
+      "content": "Okay, it's been a while. Maybe they're thinking of what to say?"
+    },
+    {
+      "timestamp": "2025-08-21T06:40:44Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:44Z",
+      "type": "thought",
+      "content": "Did I say something wrong? Was I too forward?"
+    },
+    {
+      "timestamp": "2025-08-21T06:40:46Z",
+      "type": "thought",
+      "content": "Okay, I've rewritten this message 5 times. Just send it."
+    },
+    {
+      "timestamp": "2025-08-21T06:40:46Z",
+      "type": "tool_use",
+      "tool": "send_message",
+      "data": {
+        "message": "Want to grab coffee sometime?",
+        "delivered": true
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:48Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:48Z",
+      "type": "thought",
+      "content": "I've definitely been left on read. This is intentional."
+    },
+    {
+      "timestamp": "2025-08-21T06:40:48Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:48Z",
+      "type": "thought",
+      "content": "They probably found someone more interesting to talk to."
+    },
+    {
+      "timestamp": "2025-08-21T06:40:49Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:49Z",
+      "type": "thought",
+      "content": "Maybe their phone died? Maybe they're in the hospital?"
+    },
+    {
+      "timestamp": "2025-08-21T06:40:49Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:49Z",
+      "type": "thought",
+      "content": "Maybe their phone died? Maybe they're in the hospital?"
+    },
+    {
+      "timestamp": "2025-08-21T06:40:50Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:50Z",
+      "type": "thought",
+      "content": "Maybe their phone died? Maybe they're in the hospital?"
+    },
+    {
+      "timestamp": "2025-08-21T06:40:50Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:50Z",
+      "type": "thought",
+      "content": "I'm overthinking this. But am I? But what if I'm not?"
+    },
+    {
+      "timestamp": "2025-08-21T06:40:51Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:51Z",
+      "type": "thought",
+      "content": "They probably found someone more interesting to talk to."
+    },
+    {
+      "timestamp": "2025-08-21T06:40:51Z",
+      "type": "tool_use",
+      "tool": "check_messages",
+      "data": {
+        "last_sent_status": "read",
+        "new_messages": []
+      }
+    },
+    {
+      "timestamp": "2025-08-21T06:40:51Z",
+      "type": "thought",
+      "content": "I've been ghosted. Time to accept it and move on. 😔"
+    }
+  ]
+}
