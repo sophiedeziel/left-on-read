@@ -1,40 +1,25 @@
 require_relative 'timeline_event'
 require_relative 'message'
+require_relative 'openai_message_generator'
+require_relative 'persona'
 require 'json'
 
 class AIParticipant
-  attr_reader :name, :personality, :timeline, :conversation
+  attr_reader :persona, :timeline, :conversation
 
-  PERSONALITIES = {
-    anxious_overthinker: {
-      traits: [:anxious, :analytical, :self_doubting],
-      message_style: :verbose,
-      ghost_threshold: 0.1
-    },
-    casual_ghoster: {
-      traits: [:aloof, :brief, :easily_bored],
-      message_style: :short,
-      ghost_threshold: 0.7
-    },
-    eager_pleaser: {
-      traits: [:enthusiastic, :emoji_heavy, :validation_seeking],
-      message_style: :friendly,
-      ghost_threshold: 0.2
-    },
-    mysterious_type: {
-      traits: [:cryptic, :slow_responder, :minimal],
-      message_style: :minimal,
-      ghost_threshold: 0.6
-    }
-  }
-
-  def initialize(name:, personality:)
-    @name = name
-    @personality = personality
+  def initialize(persona:, use_ai: true)
+    @persona = persona
     @timeline = []
     @conversation = nil
     @message_count = 0
     @anxiety_level = 0
+    @use_ai = use_ai
+    @ai_generator = OpenAIMessageGenerator.new if @use_ai && ENV['OPENAI_API_KEY']
+    @message_history = []
+  end
+
+  def name
+    @persona.name
   end
 
   def join_conversation(conversation)
@@ -51,9 +36,11 @@ class AIParticipant
   end
 
   def send_message(content, to:)
-    think(generate_pre_send_thought)
+    think(generate_pre_send_thought())
     
-    msg = Message.new(content: content, from: @name, to: to)
+    msg = Message.new(content: content, from: @persona.name, to: to)
+    
+    @message_history << { from_self: true, content: content, to: to }
     
     event = TimelineEvent.new(
       type: :tool_use,
@@ -77,8 +64,8 @@ class AIParticipant
     )
     
     if @conversation
-      last_sent = @conversation.get_last_sent_by(@name)
-      new_messages = @conversation.get_unread_for(@name)
+      last_sent = @conversation.get_last_sent_by(@persona.name)
+      new_messages = @conversation.get_unread_for(@persona.name)
       
       event.data[:last_sent_status] = last_sent&.read? ? 'read' : 'delivered' if last_sent
       
@@ -90,6 +77,7 @@ class AIParticipant
       if new_messages.any?
         event.data[:new_messages] = new_messages.map do |msg|
           msg.mark_as_read!
+          @message_history << { from_self: false, content: msg.content, from: msg.from }
           {
             from: msg.from,
             message: msg.content,
@@ -103,69 +91,86 @@ class AIParticipant
     
     @timeline << event
     
-    think(generate_post_check_thought(event.data))
+    think(generate_post_check_thought(data: event.data))
     
     event
   end
 
-  def generate_message
-    style = PERSONALITIES[@personality][:message_style]
-    
-    case style
-    when :verbose
-      [
-        "Hey! How's your day going? I was just thinking about that thing we talked about last time and wondered what your thoughts were?",
-        "So I saw this really interesting article today and it reminded me of our conversation. Want to hear about it?",
-        "I hope I'm not bothering you, but I just wanted to check in and see how everything's going with you!"
-      ].sample
-    when :short
-      ["Yeah good", "Cool", "K", "Sure", "Nm u?", "Busy rn"].sample
-    when :friendly
-      [
-        "Omg hiiii! How are you?? 😊✨",
-        "Hope you're having an amazing day! 💕",
-        "Miss talking to you! What have you been up to? 🌟"
-      ].sample
-    when :minimal
-      [".", "Interesting", "Perhaps", "Hm", "..."].sample
+  def generate_message(other_persona: nil)
+    if @ai_generator
+      recent_messages = @message_history.last(5)
+      
+      message = @ai_generator.generate_message(
+        persona: @persona,
+        other_persona: other_persona,
+        previous_messages: recent_messages
+      )
+      
+      return message if message
     end
+    
+    generate_fallback_message
+  end
+  
+  def generate_fallback_message
+    [
+      "Hey, how's it going?",
+      "What are you up to?",
+      "Hi! How are you?",
+      "Hey there!",
+      "What's new?"
+    ].sample
   end
 
+  def generate_pre_send_thought(other_persona: nil)
+    if @ai_generator
+      thought = @ai_generator.generate_thought(
+        persona: @persona,
+        situation: "About to send a message",
+        anxiety_level: @anxiety_level
+      )
+      return thought if thought
+    end
+    
+    generate_fallback_pre_send_thought
+  end
+  
+  def generate_fallback_pre_send_thought
+    [
+      "Should I send this?",
+      "Hope this comes across well.",
+      "Here goes nothing.",
+      "Let me send this."
+    ].sample
+  end
+
+  def generate_post_check_thought(other_persona: nil, data: {})
+    situation = if data[:new_messages]&.empty? && data[:last_sent_status] == 'read'
+      @anxiety_level += 1
+      "Message was read but no response"
+    elsif data[:new_messages]&.any?
+      @anxiety_level = 0
+      "Received new messages"
+    else
+      "Checking messages, nothing new"
+    end
+    
+    if @ai_generator
+      thought = @ai_generator.generate_thought(
+        persona: @persona,
+        situation: situation,
+        anxiety_level: @anxiety_level
+      )
+      return thought if thought
+    end
+    
+    generate_fallback_post_check_thought(data)
+  end
+  
   private
 
-  def generate_pre_send_thought
-    case @personality
-    when :anxious_overthinker
-      [
-        "Is this too much? Maybe I should wait longer...",
-        "Okay, I've rewritten this message 5 times. Just send it.",
-        "What if they think I'm annoying? No, it's fine. It's fine."
-      ].sample
-    when :casual_ghoster
-      [
-        "Ugh, they messaged again.",
-        "I guess I should respond... or should I?",
-        "This conversation is getting boring."
-      ].sample
-    when :eager_pleaser
-      [
-        "I hope they like this message!",
-        "Adding more emojis to seem friendly!",
-        "They're going to love this response!"
-      ].sample
-    when :mysterious_type
-      [
-        "...",
-        "They don't need to know everything.",
-        "Less is more."
-      ].sample
-    end
-  end
-
-  def generate_post_check_thought(data)
+  def generate_fallback_post_check_thought(data)
     if data[:new_messages]&.empty? && data[:last_sent_status] == 'read'
-      @anxiety_level += 1
-      
       case @anxiety_level
       when 1
         "They read it but haven't responded yet. They're probably just busy."
@@ -187,7 +192,6 @@ class AIParticipant
         "I've been ghosted. Time to accept it and move on. 😔"
       end
     elsif data[:new_messages]&.any?
-      @anxiety_level = 0
       "Oh thank god, they responded!"
     else
       "No new messages yet."
@@ -209,10 +213,7 @@ class AIParticipant
 
   def to_h
     {
-      protagonist: {
-        name: @name,
-        personality: @personality
-      },
+      protagonist: @persona.to_h,
       timeline: @timeline.map(&:to_h)
     }
   end
